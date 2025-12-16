@@ -11,6 +11,7 @@ void setup() {
 }
 
 void loop() {
+  // You literally do not need this part but just in case
   if (lora.available()) {
     Serial.write(lora.read());
   }
