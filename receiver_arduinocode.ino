@@ -1,22 +1,37 @@
-// Literal CODE
-// What do you think habibi
-
+#include "LoRa_E32.h"
 #include <SoftwareSerial.h>
 
-SoftwareSerial lora(2, 3); // RX, TX
+SoftwareSerial lora(8, 9);
+LoRa_E32 e32ttl(&lora);
 
 void setup() {
-  Serial.begin(9600);      
-  lora.begin(9600);        
+  Serial.begin(9600); 
+
+  e32ttl.begin();
+
+  ResponseStatus rs = e32ttl.sendMessage("Hello, LoRa!");
+
+  Serial.println(rs.getResponseDescription());
+
+  Serial.println("READY");
 }
 
 void loop() {
-  // You literally do not need this part but just in case
-  if (lora.available()) {
-    Serial.write(lora.read());
+    // If something available
+  if (e32ttl.available()>1) {
+      // read the String message
+    ResponseContainer rc = e32ttl.receiveMessage();
+    // Is something goes wrong print error
+    if (rc.status.code!=1){
+        Serial.println(rc.status.getResponseDescription());
+    }else{
+        // Print the data received
+        Serial.println(rc.data);
+    }
   }
-
   if (Serial.available()) {
-    lora.write(Serial.read());
+      String input = Serial.readString();
+      e32ttl.sendMessage(input);
+      Serial.println("Message Sent!");
   }
 }
